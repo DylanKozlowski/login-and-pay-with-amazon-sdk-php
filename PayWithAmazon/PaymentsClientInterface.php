@@ -3,7 +3,7 @@ namespace PayWithAmazon;
 
 /* Interface class to showcase the public API methods for Pay With Amazon */
 
-interface ClientInterface
+interface PaymentsClientInterface
 {
     /* Takes user configuration array from the user as input
      * Takes JSON file path with configuration information as input

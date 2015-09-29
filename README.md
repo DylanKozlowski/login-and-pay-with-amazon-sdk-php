@@ -18,7 +18,7 @@ Login and Pay with Amazon API Integration
 ## Quick Start
 
 Instantiating the client:
-Client Takes in parameters in the following format
+PaymentsClient Takes in parameters in the following format
 
 1. Associative array
 2. Path to the JSON file containing configuration information.
@@ -34,18 +34,21 @@ composer create-project amzn/login-and-pay-with-amazon-sdk-php --prefer-dist
 ├── LICENSE.txt
 ├── NOTICE.txt
 ├── PayWithAmazon
-│   ├── Client.php - Main class with the API calls
-│   ├── ClientInterface.php - Shows the public function definitions in Client.php
-│   ├── HttpCurl.php -  Client class uses this file to execute the GET/POST
+│   ├── BaseClient.php - Abstract class with common functions used in PaymentsClient and ReportsClient
+│   ├── HttpCurl.php - Client classes use this file to execute the GET/POST
 │   ├── HttpCurlInterface.php - Shows the public function definitions in HttpCurl.php
 │   ├── IpnHandler.php - Class handles verification of the IPN
 │   ├── IpnHandlerInterface.php - Shows the public function definitions in IpnHandler.php
+│   ├── PaymentsClient.php - Main class with the OffAmazonPayments API calls
+│   ├── PaymentsClientInterface.php - Shows the public function definitions in PaymentsClient.php
 │   ├── Regions.php -  Defines the regions that is supported
+│   ├── ReportsClient.php - Class with the Reports API calls
+│   ├── ReportsClientInterface.php - Shows the public function definitions in ReportsClient.php
 │   ├── ResponseInterface.php - Shows the public function definitions in ResponseParser.php
 │   └── ResponseParser.php -  Parses the API call response
 ├── README.md
 └── UnitTests
-    ├── ClientTest.php
+    ├── PaymentsClientTest.php
     ├── config.json
     ├── coverage.txt
     ├── IpnHandlerTest.php
@@ -79,12 +82,12 @@ composer create-project amzn/login-and-pay-with-amazon-sdk-php --prefer-dist
 
 ## Setting Configuration
 
-Setting configuration while instantiating the Client object
+Setting configuration while instantiating the Client objects
 ```php
 <?php
 namespace PayWithAmazon;
 
-require_once 'Client.php';
+require_once 'PaymentsClient.php';
 // Your Login and Pay with Amazon keys are available in your Seller Central account
 
 // PHP Associative array
@@ -98,7 +101,7 @@ $config = array('merchant_id' => 'YOUR_MERCHANT_ID',
 $config = 'PATH_TO_JSON_FILE';
 
 // Instantiate the client class with the config type
-$client = new Client($config);
+$client = new PaymentsClient($config);
 ```
 ### Testing in Sandbox Mode
 
@@ -114,14 +117,14 @@ $config = array('merchant_id'   => 'YOUR_MERCHANT_ID',
                 'region'     	=> 'REGION',
                 'sandbox'       => true );
 
-$client = new Client($config);
+$client = new PaymentsClient($config);
 
-// Also you can set the sandbox variable in the config() array of the Client class by
+// Also you can set the sandbox variable in the config() array of the Client classes by
 
 $client->setSandbox(true);
 ```
 ### Setting Proxy values
-Proxy parameters can be set after Instantiating the Client Object with the following setter
+Proxy parameters can be set after instantiating the Client object with the following setter
 ```php
 $proxy =  array();
 $proxy['proxy_user_host'] // Hostname for the proxy
@@ -208,9 +211,9 @@ and the amount captured by making the `capture` API call after the shipment is c
 | Amazon Reference ID 	     | `amazon_reference_id` 	    | yes       | OrderReference ID (`starts with P01 or S01`) or <br>Billing Agreement ID (`starts with B01 or C01`)       |
 | Amazon OrderReference ID   | `amazon_order_reference_id`  | no        | OrderReference ID (`starts with P01 or S01`) if no Amazon Reference ID is provided                        |
 | Amazon Billing Agreement ID| `amazon_billing_agreement_id`| no        | Billing Agreement ID (`starts with B01 or C01`) if no Amazon Reference ID is provided                     |
-| Merchant ID         	     | `merchant_id`         	    | no        | Value taken from config array in Client.php                                                               |
+| Merchant ID         	     | `merchant_id`         	    | no        | Value taken from config array in BaseClient.php                                                               |
 | Charge Amount       	     | `charge_amount`       	    | yes       | Amount that needs to be captured.<br>Maps to API call variables `amount` , `authorization_amount`         |
-| Currency code       	     | `currency_code`       	    | no        | If no value is provided, value is taken from the config array in Client.php      		            |
+| Currency code       	     | `currency_code`       	    | no        | If no value is provided, value is taken from the config array in BaseClient.php      		            |
 | Authorization Reference ID | `authorization_reference_id` | yes       | Unique string to be passed									            |
 | Transaction Timeout 	     | `transaction_timeout`        | no        | Timeout for Authorization - Defaults to 1440 minutes						            |
 | Capture Now	             | `capture_now`                | no        | Will capture the payment automatically when set to `true`. Defaults to `false`						                                            |
@@ -270,7 +273,7 @@ See the [API Response](https://github.com/amzn/login-and-pay-with-amazon-sdk-php
 $config = array('client_id' => 'YOUR_LWA_CLIENT_ID',
                 'region'    => 'REGION' );
 
-$client = new Client($config);
+$client = new PaymentsClient($config);
 
 // Client ID can also be set using the setter function setClientId($client_id)
 $client->setClientId(‘YOUR_LWA_CLIENT_ID’);
